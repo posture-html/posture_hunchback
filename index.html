@@ -84,13 +84,18 @@
   </style>
 </head>
 <body>
+  
+  <p style="font-size: 0.95rem; color: #666; margin-bottom: 6px; text-align: center;">
+  本網頁為【AI輔助健康姿勢偵測與矯正系統】偵測功能介面<br>
+  以訓練模型分析照片進行體態偵測
+  </p>
 
   <h2>📷 駝背偵測工具</h2>
 
   <button id="switchCamera">🔄 切換鏡頭</button><br>
   <video id="video" autoplay playsinline></video><br>
 
-   <!-- ✅ 拍照與選圖按鈕：左右排列 + 寬度一致 -->
+   <!--  拍照與選圖按鈕：左右排列 + 寬度一致 -->
   <div style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
     <button id="snap" class="action-button">
       📸 拍照
@@ -111,8 +116,6 @@
 
   <div id="result"></div>
 
-  <button onclick="testConnection()">🔗 測試後端連線</button>
-  <p id="connectionResult"></p>
 
   <script>
     const video = document.getElementById('video');
@@ -128,7 +131,7 @@
     let useFrontCamera = true;
     let imageBlob = null;
 
-    // ✅ 初始化頁面（重新啟動鏡頭、清除畫面）
+    //  初始化頁面（重新啟動鏡頭、清除畫面）
     function resetPage() {
       console.log("🔄 重設頁面中...");
       preview.src = "";
@@ -198,6 +201,11 @@
     };
 
     // 上傳圖片
+    const labelMap = {
+      normal: "正常",
+      hunchback: "駝背",
+    };
+
     submitBtn.onclick = () => {
       if (!imageBlob) {
         alert("請先拍照或選擇圖片！");
@@ -214,19 +222,18 @@
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          const resultMessage = `✅ 預測結果：${data.result}`;
+          const resultMessage = `✅ 預測結果：${labelMap[data.result] || data.result}`;
 
           // 顯示結果
           resultBox.innerHTML = `
             ${resultMessage}<br><br>
-            📱 請點選手機「返回鍵」回到 App<br>
-            ⏳ 5 秒後畫面將自動初始化
+            📱 請點選手機「返回鍵」回到 App 輸入偵測結果<br>
           `;
 
-          alert(`${resultMessage}\n\n📱 請點選手機「返回鍵」回到 App`);
+          alert(`${resultMessage}\n\n📱 請點選手機「返回鍵」回到 App 輸入偵測結果`);
 
           // 5 秒後自動清空畫面
-          setTimeout(resetPage, 5000);
+          setTimeout(resetPage, 10000);
 
         } else if (data.error) {
           const errMsg = "❌ 預測錯誤：" + data.error;
@@ -244,23 +251,6 @@
         alert(msg);
       });
     };
-
-    // 測試後端連線
-    function testConnection() {
-      const result = document.getElementById("connectionResult");
-      result.innerText = "連線中...";
-      fetch("https://pose-app-964k.onrender.com")
-        .then(response => {
-          if (!response.ok) throw new Error("連線失敗");
-          return response.json();
-        })
-        .then(data => {
-          result.innerText = "✅ 成功連線後端：" + data.message;
-        })
-        .catch(error => {
-          result.innerText = "❌ 無法連線後端：" + error.message;
-        });
-    }
   </script>
 
 </body>
