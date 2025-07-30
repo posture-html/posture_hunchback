@@ -85,7 +85,7 @@
 </head>
 <body>
   
-  <p style="font-size: 0.95rem; color: #666; margin-bottom: 6px; text-align: center;">
+  <p style="font-size: 0.85rem; color: #666; margin-bottom: 6px; text-align: center;">
   本網頁為【AI輔助健康姿勢偵測與矯正系統】偵測功能介面<br>
   以訓練模型分析照片進行體態偵測
   </p>
@@ -128,7 +128,7 @@
     const resultBox = document.getElementById('result');
 
     let currentStream = null;
-    let useFrontCamera = true;
+    let useFrontCamera = false;
     let imageBlob = null;
 
     //  初始化頁面（重新啟動鏡頭、清除畫面）
@@ -215,6 +215,8 @@
       const formData = new FormData();
       formData.append('file', imageBlob, 'upload.png');
 
+      resultBox.innerHTML = "偵測中，請稍後...";
+      
       fetch('https://pose-app-964k.onrender.com/predict/hunchback', {
         method: 'POST',
         body: formData
