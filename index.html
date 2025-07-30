@@ -224,17 +224,29 @@
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          const resultMessage = `✅ 預測結果：${labelMap[data.result] || data.result}`;
+          const label = labelMap[data.result] || data.result;
+          let resultMessage = `✅ 預測結果：${label}<br><br>`;
 
-          // 顯示結果
-          resultBox.innerHTML = `
-            ${resultMessage}<br><br>
-            📱 請點選手機「返回鍵」回到 App 輸入偵測結果<br>
-          `;
+          if (data.result === "normal") {
+            resultMessage += `
+              🎉 您的體態判斷為正常，目前無需特別訓練計畫。<br><br>
+              📱 若您仍希望進行姿勢改善練習，也可在返回 App 後輸入「駝背」取得相關計畫。
+            `;
+          } else {
+            resultMessage += `
+            📱 請點選手機「返回鍵」回到 App 輸入偵測結果
+            `;
+          }
 
-          alert(`${resultMessage}\n\n📱 請點選手機「返回鍵」回到 App 輸入偵測結果`);
+          resultBox.innerHTML = resultMessage;
+          
+          if (data.result === "normal") {
+            alert(`✅ 預測結果：正常\n\n🎉 您的體態判斷為正常，目前無需特別訓練計畫。\n📱 若您仍希望進行姿勢改善練習，也可在返回 App 後輸入「駝背」取得相關計畫`);
+          } else {
+            alert(`✅ 預測結果：駝背\n\n📱 請點選手機「返回鍵」回到 App 輸入偵測結果`);
+          }
 
-          // 5 秒後自動清空畫面
+          // 10 秒後自動清空畫面
           setTimeout(resetPage, 10000);
 
         } else if (data.error) {
