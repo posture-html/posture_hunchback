@@ -66,7 +66,8 @@
       <div class="card">
         <h2 style="margin-top:0;">偵測結果</h2>
         <div id="result" class="muted">尚未偵測</div>
-        <img id="overlayImg" alt="骨架疊圖" />
+        <img id="overlayImg" alt="骨架疊圖" style="max-width:100%; max-height:360px; border:1px solid #ddd; border-radius:8px; display:block; margin-top:8px;" />
+
       </div>
     </div>
   </div>
@@ -128,7 +129,7 @@
       canvas.toBlob(blob => { imageBlob = blob; }, 'image/png');
       resultBox.textContent = "已拍照，準備上傳…";
       resultBox.className = "muted";
-      overlayImg.src = "";
+      .src = "";
     };
 
     uploadInput.onchange = e => {
@@ -140,12 +141,12 @@
       imageBlob = file;
       resultBox.textContent = "已選擇圖片，準備上傳…";
       resultBox.className = "muted";
-      overlayImg.src = "";
+      .src = "";
     };
 
     resetBtn.onclick = () => {
       preview.src = "";
-      overlayImg.src = "";
+      .src = "";
       imageBlob = null;
       resultBox.textContent = "尚未偵測";
       resultBox.className = "muted";
@@ -171,7 +172,7 @@
       submitBtn.disabled = true;
       resultBox.textContent = "偵測中，請稍後…";
       resultBox.className = "muted";
-      overlayImg.src = "";
+      .src = "";
 
       try {
         const fd = new FormData();
@@ -216,7 +217,7 @@
 
         // 顯示骨架疊圖
         if (showOverlay.checked && r.overlay_base64) {
-          overlayImg.src = `data:image/jpeg;base64,${r.overlay_base64}`;
+          .src = `data:image/jpeg;base64,${r.overlay_base64}`;
         }
 
       } catch (err) {
