@@ -192,7 +192,10 @@
     resultBox.innerHTML = "偵測中，請稍後...";
 
     try {
-      const res = await fetch(`${API_BASE}${currentEndpoint}`, { method: 'POST', body: fd });
+      const res = await fetch(`${API_BASE}${currentEndpoint}?ai=1`, {
+        method: 'POST',
+        body: fd
+      });
       const ct = res.headers.get('content-type') || '';
       if (!ct.includes('application/json')) {
         const txt = await res.text();
@@ -226,13 +229,28 @@
       if (r.sl_ratio_rel!==undefined) lines.push(`肩/髖相對比例：${r.sl_ratio_rel}`);
       if (r.sl_angle   !== undefined) lines.push(`肩線傾斜角：${r.sl_angle}°`);
 
-      resultBox.innerHTML = "✅ 偵測完成：<br>" + lines.join("<br>");
+      let html = "✅ 偵測完成：<br>" + lines.join("<br>");
+
+      // ✅ 如果有 AI 摘要，顯示在下方
+      if (data.ai_summary) {
+        const ai = data.ai_summary;
+        html += "<hr><strong>🤖 AI 摘要：</strong><br>";
+        if (ai.title) html += `<b>${ai.title}</b><br>`;
+        if (ai.explanation) html += `<p>${ai.explanation}</p>`;
+        if (ai.level) html += `等級：<b>${ai.level}</b><br>`;
+        if (ai.next_steps && ai.next_steps.length) {
+          html += "<u>建議：</u><br><ul style='text-align:left;'>";
+          ai.next_steps.forEach(s => html += `<li>${s}</li>`);
+          html += "</ul>";
+        }
+        if (ai.caution) html += `<p style='color:red;'>⚠️ ${ai.caution}</p>`;
+      }
+
+      resultBox.innerHTML = html;
 
       // 可選：結果通知
       alert(`✅ 偵測完成：${r.level || '—'}`);
 
-      // 10 秒後重置
-      setTimeout(resetPage, 10000);
 
     } catch (err) {
       const msg = "❌ 請求失敗：" + err.message;
