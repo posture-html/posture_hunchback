@@ -50,6 +50,17 @@
       color: #333;
     }
 
+    video {
+      position: relative;
+      z-index: 1;
+    }
+    #overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+    }
+
     /* ✅ 新增：統一按鈕樣式 */
     .action-button {
       flex: 1 1 45%;
@@ -116,6 +127,9 @@
 
   <div id="result"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.5/drawing_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.5/camera_utils.js"></script>
 
 <script>
   const video = document.getElementById('video');
@@ -126,6 +140,45 @@
   const switchCameraBtn = document.getElementById('switchCamera');
   const uploadInput = document.getElementById('uploadImage');
   const resultBox = document.getElementById('result');
+
+  const overlay = document.createElement('canvas');
+  overlay.id = 'overlay';
+  overlay.style.position = 'absolute';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = 'auto';
+  overlay.style.pointerEvents = 'none';
+  video.parentNode.insertBefore(overlay, video.nextSibling);
+
+  const ctx = overlay.getContext('2d');
+
+  const pose = new Pose.Pose({
+    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/${file}`
+  });
+  pose.setOptions({
+    modelComplexity: 1,
+    smoothLandmarks: true,
+    minDetectionConfidence: 0.6,
+    minTrackingConfidence: 0.5
+  });
+
+  pose.onResults((results) => {
+    ctx.clearRect(0, 0, overlay.width, overlay.height);
+    if (results.poseLandmarks) {
+      Pose.drawConnectors(ctx, results.poseLandmarks, Pose.POSE_CONNECTIONS, { color: '#00FF00', lineWidth: 3 });
+      Pose.drawLandmarks(ctx, results.poseLandmarks, { color: '#FF0000', lineWidth: 2 });
+    }
+  });
+
+  const cam = new Camera.Camera(video, {
+    onFrame: async () => {
+      await pose.send({ image: video });
+    },
+    width: 640,
+    height: 480
+  });
+  cam.start();
 
   // ✅ 抽出 API 位置（本機/ ngrok / Render 三選一）
   // const API_BASE = "http://127.0.0.1:5000";
@@ -240,7 +293,9 @@
       alert(msg);
     }
   };
+
 </script>
+
 
 </body>
 </html>
