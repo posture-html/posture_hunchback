@@ -127,11 +127,7 @@
   const uploadInput = document.getElementById('uploadImage');
   const resultBox = document.getElementById('result');
   
-  const fd = new FormData();
-  fd.append("file", imageBlob);
-  const res = await fetch("http://127.0.0.1:5000/pose_img", { method: "POST", body: fd });
-  const blob = await res.blob();
-  preview.src = URL.createObjectURL(blob);
+
 
   // ✅ 抽出 API 位置（本機/ ngrok / Render 三選一）
   // const API_BASE = "http://127.0.0.1:5000";
