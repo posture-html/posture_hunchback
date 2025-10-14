@@ -112,6 +112,7 @@
   <canvas id="canvas" style="display:none;"></canvas>
   <img id="preview" alt="圖片預覽" /><br>
 
+  <button id="poseBtn">🦴 產生骨架圖</button>
   <button id="submitBtn">🚀 上傳圖片</button>
 
   <div id="result"></div>
@@ -126,7 +127,8 @@
   const switchCameraBtn = document.getElementById('switchCamera');
   const uploadInput = document.getElementById('uploadImage');
   const resultBox = document.getElementById('result');
-  
+
+  const poseBtn = document.getElementById('poseBtn');
 
 
   // ✅ 抽出 API 位置（本機/ ngrok / Render 三選一）
@@ -185,7 +187,7 @@
     imageBlob = file;
   };
 
-  // ✅ 這裡改：解析 result 物件，而不是把 result 當字串
+  //  這裡改：解析 result 物件，而不是把 result 當字串
   submitBtn.onclick = async () => {
     if (!imageBlob) { alert("請先拍照或選擇圖片！"); return; }
 
@@ -208,6 +210,39 @@
         alert(msg);
         return;
       }
+
+  poseBtn.onclick = async () => {
+    if (!imageBlob) { alert("請先拍照或選擇圖片！"); return; }
+
+    // UI 鎖定
+    poseBtn.disabled = true;
+    poseBtn.textContent = "處理中…";
+    resultBox.textContent = "產生骨架圖中…";
+
+    try {
+      const fd = new FormData();
+      fd.append('file', imageBlob, 'upload.jpg');
+
+      // 後端回傳繪好骨架的圖片
+      const res = await fetch(`${API_BASE}/pose_image`, {
+        method: 'POST',
+        body: fd
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const blob = await res.blob();
+      if (preview.src) URL.revokeObjectURL(preview.src);
+      preview.src = URL.createObjectURL(blob);
+
+      resultBox.textContent = "已產生骨架圖";
+    } catch (err) {
+      resultBox.textContent = "產生失敗：" + err.message;
+      alert("產生骨架圖失敗：" + err.message);
+    } finally {
+      poseBtn.disabled = false;
+      poseBtn.textContent = "產生骨架圖";
+    }
+  };
 
       const r = data.result;
       // r.level 例如：正常 / 輕度駝背 / 重度駝背（或高低肩）
