@@ -224,7 +224,7 @@
       fd.append('file', imageBlob, 'upload.jpg');
 
       // 後端回傳繪好骨架的圖片
-      const res = await fetch(`${API_BASE}/pose_image`, {
+      const res = await fetch(`${API_BASE}/pose_img`, {
         method: 'POST',
         body: fd
       });
