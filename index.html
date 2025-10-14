@@ -171,15 +171,17 @@
     }
   });
 
-  const cam = new Camera.Camera(video, {
-    onFrame: async () => {
-      await pose.send({ image: video });
-    },
-    width: 640,
-    height: 480
-  });
-  cam.start();
-
+  window.onload = () => {
+    const cam = new Camera.Camera(video, {
+      onFrame: async () => {
+        await pose.send({ image: video });
+      },
+      width: 640,
+      height: 480
+    });
+    cam.start();
+  };
+  
   // ✅ 抽出 API 位置（本機/ ngrok / Render 三選一）
   // const API_BASE = "http://127.0.0.1:5000";
   // const API_BASE = "https://<你的-ngrok>.ngrok-free.app";
@@ -189,8 +191,7 @@
   // 先固定用駝背：
   let currentEndpoint = "/hunchback";
 
-  let currentStream = null;
-  let useFrontCamera = false;
+
   let imageBlob = null;
 
   function resetPage() {
@@ -200,18 +201,7 @@
     startCamera();
   }
 
-  async function startCamera() {
-    if (currentStream) currentStream.getTracks().forEach(t => t.stop());
-    try {
-      currentStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: useFrontCamera ? "user" : "environment" }
-      });
-      video.srcObject = currentStream;
-    } catch (err) { alert("❌ 攝影機錯誤：" + err.message); }
-  }
 
-  switchCameraBtn.onclick = () => { useFrontCamera = !useFrontCamera; startCamera(); };
-  startCamera();
 
   snapBtn.onclick = () => {
     canvas.width = video.videoWidth;
