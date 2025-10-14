@@ -171,8 +171,14 @@
     }
   });
 
-  window.onload = () => {
-    const cam = new Camera.Camera(video, {
+  let cam = null;
+  switchCameraBtn.onclick = () => {
+    if (cam) {
+      alert("鏡頭已啟動");
+      return;
+    }
+
+    cam = new Camera.Camera(video, {
       onFrame: async () => {
         await pose.send({ image: video });
       },
@@ -180,8 +186,9 @@
       height: 480
     });
     cam.start();
+    alert("鏡頭啟動，允許權限後即可看到畫面");
   };
-  
+
   // ✅ 抽出 API 位置（本機/ ngrok / Render 三選一）
   // const API_BASE = "http://127.0.0.1:5000";
   // const API_BASE = "https://<你的-ngrok>.ngrok-free.app";
