@@ -132,7 +132,7 @@
   // ✅ 抽出 API 位置（本機/ ngrok / Render 三選一）
   // const API_BASE = "http://127.0.0.1:5000";
   // const API_BASE = "https://<你的-ngrok>.ngrok-free.app";
-  const API_BASE = "https://d44da8441c9d.ngrok-free.app";
+  const API_BASE = "https://mammary-overwidely-braylen.ngrok-free.dev";
 
   // （可選）要不要做成下拉選單切換端點？
   // 先固定用駝背：
@@ -226,10 +226,10 @@
       const lines = [];
       if (r.side       !== undefined) lines.push(`面向：${r.side}`);
       if (r.level      !== undefined) lines.push(`等級：${r.level}`);
-      // if (r.score      !== undefined) lines.push(`分數：${r.score}`);
+      if (r.score      !== undefined) lines.push(`分數：${r.score}`);
       if (r.hr         !== undefined) lines.push(`頭前傾比例：${r.hr}`);
       if (r.neck_angle !== undefined) lines.push(`頸部角度：${r.neck_angle}°`);
-      // if (r.spine_angle!== undefined) lines.push(`脊椎角度：${r.spine_angle}°`);
+      if (r.spine_angle!== undefined) lines.push(`脊椎角度：${r.spine_angle}°`);
       if (r.kyphosis   !== undefined) lines.push(`脊柱後凸：${r.kyphosis}°`);
       if (r.higher     !== undefined) lines.push(`較高側：${r.higher}`);
       if (r.sl_ratio   !== undefined) lines.push(`肩膀高低差比例：${r.sl_ratio}`);
