@@ -239,10 +239,10 @@
     const rows = [];
     if (r.side !== undefined)         rows.push(['面向', r.side]);
     if (r.level !== undefined)        rows.push(['等級', r.level]);
-    if (r.score !== undefined)        rows.push(['分數', fmt(r.score, { dp: 0 })]);
+    //if (r.score !== undefined)        rows.push(['分數', fmt(r.score, { dp: 0 })]);
     if (r.hr !== undefined)           rows.push(['頭前傾比例', fmt(r.hr, { dp: 3 })]);
     if (r.neck_angle !== undefined)   rows.push(['頸部角度', fmt(r.neck_angle, { dp: 1, suffix: '°' })]);
-    if (r.spine_angle !== undefined)  rows.push(['脊椎角度', fmt(r.spine_angle, { dp: 1, suffix: '°' })]);
+    //if (r.spine_angle !== undefined)  rows.push(['脊椎角度', fmt(r.spine_angle, { dp: 1, suffix: '°' })]);
     if (r.kyphosis !== undefined)     rows.push(['脊柱後凸', fmt(r.kyphosis, { dp: 1, suffix: '°' })]);
 
     // 高低肩類欄位
