@@ -50,7 +50,7 @@
       color: #333;
     }
 
-    /* ✅ 新增：統一按鈕樣式 */
+    /* ✅ 新增：統一按鈕樣式（保留原樣） */
     .action-button {
       flex: 1 1 45%;
       min-width: 140px;
@@ -80,6 +80,46 @@
         max-width: 700px;
         margin: auto;
       }
+    }
+
+    /* ✅ 新增：結果表格樣式（僅影響結果展示） */
+    .result-card {
+      margin-top: 16px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      overflow: hidden;
+      text-align: left;
+    }
+    .result-title {
+      padding: 12px 16px;
+      font-weight: 700;
+      color: #333;
+      border-bottom: 1px solid #eee;
+    }
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+    .result-table th,
+    .result-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f1f1f1;
+      vertical-align: top;
+    }
+    .result-table th {
+      width: 40%;
+      background: #fafafa;
+      font-weight: 600;
+      color: #444;
+    }
+    .result-table tr:last-child td,
+    .result-table tr:last-child th {
+      border-bottom: none;
+    }
+    @media (max-width: 420px) {
+      .result-table th, .result-table td { padding: 10px; }
     }
   </style>
 </head>
@@ -127,7 +167,6 @@
   const resultBox = document.getElementById('result');
 
   const poseBtn = document.getElementById('poseBtn');
-
 
   // ✅ 抽出 API 位置（本機/ ngrok / Render 三選一）
   // const API_BASE = "http://127.0.0.1:5000";
@@ -185,7 +224,58 @@
     imageBlob = file;
   };
 
-  //  這裡改：解析 result 物件，而不是把 result 當字串
+  /* ✅ 新增：表格渲染函式（其餘邏輯不動） */
+  function renderResultTable(r) {
+    // 統一數值格式
+    const fmt = (v, opt = {}) => {
+      if (v === undefined || v === null) return '—';
+      if (typeof v === 'number') {
+        const n = (opt.dp ?? 2);
+        return v.toFixed(n) + (opt.suffix || '');
+      }
+      return String(v);
+    };
+
+    const rows = [];
+    if (r.side !== undefined)         rows.push(['面向', r.side]);
+    if (r.level !== undefined)        rows.push(['等級', r.level]);
+    if (r.score !== undefined)        rows.push(['分數', fmt(r.score, { dp: 0 })]);
+    if (r.hr !== undefined)           rows.push(['頭前傾比例', fmt(r.hr, { dp: 3 })]);
+    if (r.neck_angle !== undefined)   rows.push(['頸部角度', fmt(r.neck_angle, { dp: 1, suffix: '°' })]);
+    if (r.spine_angle !== undefined)  rows.push(['脊椎角度', fmt(r.spine_angle, { dp: 1, suffix: '°' })]);
+    if (r.kyphosis !== undefined)     rows.push(['脊柱後凸', fmt(r.kyphosis, { dp: 1, suffix: '°' })]);
+
+    // 高低肩類欄位
+    if (r.higher !== undefined)       rows.push(['較高側', r.higher]);
+    if (r.sl_ratio !== undefined)     rows.push(['肩膀高低差比例', fmt(r.sl_ratio, { dp: 3 })]);
+    if (r.sl_ratio_rel !== undefined) rows.push(['肩/髖相對比例', fmt(r.sl_ratio_rel, { dp: 3 })]);
+    if (r.sl_angle !== undefined)     rows.push(['肩線傾斜角', fmt(r.sl_angle, { dp: 1, suffix: '°' })]);
+
+    // 其他可能擴充欄位（避免漏顯）
+    for (const k of Object.keys(r)) {
+      if (['side','level','score','hr','neck_angle','spine_angle','kyphosis','higher','sl_ratio','sl_ratio_rel','sl_angle'].includes(k)) continue;
+      rows.push([k, r[k]]);
+    }
+
+    const tableHTML = `
+      <div class="result-card">
+        <div class="result-title">✅ 偵測結果</div>
+        <table class="result-table">
+          <tbody>
+            ${rows.map(([k, v]) => `
+              <tr>
+                <th>${k}</th>
+                <td>${v}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+    resultBox.innerHTML = tableHTML;
+  }
+
+  // 這裡改：解析 result 物件，用表格渲染
   submitBtn.onclick = async () => {
     if (!imageBlob) { alert("請先拍照或選擇圖片！"); return; }
   
@@ -214,33 +304,19 @@
         const msg = "❌ 預測失敗：" + (data.error || "未知錯誤");
         resultBox.innerHTML = msg;
         alert(msg);
+        submitBtn.disabled = false;
         return;
       }
 
       const r = data.result;
-      // r.level 例如：正常 / 輕度駝背 / 重度駝背（或高低肩）
-      // r 其他欄位：hr / neck_angle / spine_angle / kyphosis / score / side（駝背）
-      // 高低肩則是：sl_ratio / sl_ratio_rel / sl_angle / score / level / higher（若你有回傳）
 
-      // ✅ 美觀輸出（自動偵測有哪幾個欄位）
-      const lines = [];
-      if (r.side       !== undefined) lines.push(`面向：${r.side}`);
-      if (r.level      !== undefined) lines.push(`等級：${r.level}`);
-      //if (r.score      !== undefined) lines.push(`分數：${r.score}`);
-      if (r.hr         !== undefined) lines.push(`頭前傾比例：${r.hr}`);
-      if (r.neck_angle !== undefined) lines.push(`頸部角度：${r.neck_angle}°`);
-      //if (r.spine_angle!== undefined) lines.push(`脊椎角度：${r.spine_angle}°`);
-      if (r.kyphosis   !== undefined) lines.push(`脊柱後凸：${r.kyphosis}°`);
-      if (r.higher     !== undefined) lines.push(`較高側：${r.higher}`);
-      if (r.sl_ratio   !== undefined) lines.push(`肩膀高低差比例：${r.sl_ratio}`);
-      if (r.sl_ratio_rel!==undefined) lines.push(`肩/髖相對比例：${r.sl_ratio_rel}`);
-      if (r.sl_angle   !== undefined) lines.push(`肩線傾斜角：${r.sl_angle}°`);
+      // ✅ 用表格顯示（唯一變更點）
+      renderResultTable(r);
 
-      resultBox.innerHTML = "✅ 偵測完成：<br>" + lines.join("<br>");
-
-      // 可選：結果通知
+      // 可選：結果通知（保留原本）
       alert(`✅ 偵測完成：${r.level || '—'}`);
 
+      // ---------- (2) 取回骨架圖（保留原本） ----------
       const fd2 = new FormData();
       fd2.append('file', imageBlob, 'upload.jpg');
   
@@ -258,6 +334,8 @@
       const msg = "❌ 請求失敗：" + err.message;
       resultBox.innerHTML = msg;
       alert(msg);
+    } finally {
+      submitBtn.disabled = false;
     }
   };
 </script>
