@@ -9,247 +9,163 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* ===== 基礎變數（配色、陰影、圓角） ===== */
+  /* ========== 基礎設計變數 ========== */
+  :root{
+    --bg1:#eef3ff; --bg2:#f7fbff;
+    --text:#0f172a; --muted:#6b7280;
+    --primary:#2563eb; --primary-2:#1d4ed8;
+    --accent:#10b981; --accent-2:#0ea371;
+    --surface:#ffffff; --radius:14px;
+    --bd:rgba(15,23,42,.08);
+    --shadow:0 10px 30px rgba(2,6,23,.08);
+    --shadow-lg:0 16px 45px rgba(2,6,23,.12);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(900px 600px at 10% -10%, #e7f0ff 0%, transparent 60%),
+      radial-gradient(900px 600px at 120% 0%, #f0fff9 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg1), var(--bg2));
+    padding:16px 14px 24px;
+    text-align:center;
+  }
+
+  /* 手機版版心（不動 HTML 結構） */
+  body > *{ width:100%; max-width: 560px; margin: 0 auto; }
+
+  p{
+    font-size:.92rem; color:var(--muted);
+    margin:0 0 8px;
+  }
+
+  h2{
+    margin: 6px auto 12px;
+    padding: 10px 14px;
+    font-weight: 800;
+    font-size: clamp(1.1rem, 1rem + 1vw, 1.5rem);
+    background: #fff;
+    border-radius: 999px;
+    display:inline-block;
+    box-shadow: var(--shadow);
+  }
+
+  /* 視覺容器：video/canvas/img */
+  video, canvas, img{
+    width:100%; max-width:100%; height:auto;
+    margin-top:10px; background:#fff;
+    border-radius: var(--radius);
+    border:1px solid var(--bd);
+    box-shadow: var(--shadow);
+  }
+
+  /* 按鈕（共用） */
+  button, input[type="file"]{
+    display:inline-flex; align-items:center; justify-content:center;
+    gap:.45rem;
+    padding: 12px 16px; margin:10px auto;
+    font-size: 1rem; line-height: 1.05;
+    border-radius: 12px; border:1px solid var(--bd);
+    background: #fff; color:var(--text);
+    box-shadow: var(--shadow);
+    cursor:pointer;
+    transition: transform .12s ease, box-shadow .18s ease, filter .18s ease;
+  }
+  button:hover{ transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+  button:active{ transform: translateY(0); }
+
+  /* 你的兩顆綠色行動鍵：保持語意但在手機調整寬度 */
+  .action-button{
+    background: linear-gradient(180deg, var(--accent), var(--accent-2));
+    color:#fff; border-color: transparent;
+    min-width: 48%; /* 手機兩欄 */
+    max-width: 260px; height:48px;
+  }
+
+  /* 主要操作按鈕 */
+  #submitBtn{
+    background: linear-gradient(180deg, var(--primary), var(--primary-2));
+    color:#fff; border-color: transparent;
+    width:100%; /* 手機全寬，醒目 */
+    max-width: none;
+  }
+  #submitBtn:disabled{ opacity:.8; filter:saturate(.7); cursor:not-allowed; }
+
+  /* 切換鏡頭按鈕：做成次要鍵 */
+  #switchCamera{
+    width:100%;
+    background: linear-gradient(180deg, #e8f0ff, #dfe9ff);
+    color:#0b2a7a;
+  }
+
+  /* 結果/連線訊息區 */
+  #result, #connectionResult{
+    margin-top:14px; font-weight:600; color:var(--text);
+    text-align:left;
+  }
+
+  /* 結果卡片與表格（不改結構，只微調配色與字級） */
+  .result-card{
+    margin-top:14px; background:var(--surface);
+    border-radius: var(--radius);
+    border:1px solid var(--bd); box-shadow: var(--shadow);
+    overflow:hidden; text-align:left;
+  }
+  .result-title{
+    padding:12px 14px; font-weight:800;
+    background: linear-gradient(180deg, #fbfbff, #f5f7ff);
+    border-bottom:1px solid #eef1f6;
+  }
+  .result-table{ width:100%; border-collapse: collapse; font-size: .98rem; }
+  .result-table th, .result-table td{
+    padding: 11px 14px; border-bottom:1px solid #f1f3f7; vertical-align:top;
+    word-break: break-word;
+  }
+  .result-table th{ width:44%; color:#334155; background:#fbfcff; font-weight:700; }
+  .result-table tr:last-child th, .result-table tr:last-child td{ border-bottom:none; }
+
+  /* ========== 響應式：更小螢幕（<=400px）微調 ========== */
+  @media (max-width: 400px){
+    body{ padding:12px 10px 20px; }
+    h2{ font-size:1.2rem; padding:8px 12px; }
+    .action-button{ min-width: 100%; }      /* 變單欄堆疊 */
+    #switchCamera{ margin-top:6px; }
+    .result-table{ font-size: .95rem; }
+    .result-table th, .result-table td{ padding:10px 12px; }
+  }
+
+  /* ========== 平板（>=768px）維持你原本的寬度上限 ========== */
+  @media (min-width: 768px){
+    body{ padding-top:22px; }
+    body > *{ max-width: 720px; }
+  }
+
+  /* ========== 深色模式（自動偵測） ========== */
+  @media (prefers-color-scheme: dark){
     :root{
-      --bg-grad-1:#eef3ff;
-      --bg-grad-2:#f7fbff;
-      --card-bg:#ffffffcc;
-      --text:#1a1a1a;
-      --muted:#6b7280;
-      --primary:#2563eb;        /* 藍 */
-      --primary-hover:#1d4ed8;
-      --accent:#10b981;         /* 綠 */
-      --accent-hover:#0ea371;
-      --surface:#ffffff;
-      --radius:14px;
-      --shadow:0 10px 30px rgba(2,6,23,.08);
-      --shadow-lg:0 16px 45px rgba(2,6,23,.12);
-      --ring:0 0 0 3px rgba(37,99,235,.15);
+      --bg1:#0b1220; --bg2:#0b1220;
+      --surface:#0f172a; --text:#e5e7eb; --muted:#9aa3b2;
+      --bd:rgba(255,255,255,.08);
     }
-
-    * { box-sizing: border-box; }
-
     body{
-      margin:0;
-      min-height:100vh;
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-      color:var(--text);
-      /* 柔和漸層背景 */
-      background: radial-gradient(1200px 800px at 20% -10%, #e7f0ff 0%, transparent 60%),
-                  radial-gradient(1200px 900px at 120% 10%, #f0fff9 0%, transparent 60%),
-                  linear-gradient(180deg, var(--bg-grad-1), var(--bg-grad-2));
-      padding: 32px 20px 40px;
-      display:flex;
-      align-items:flex-start;
-      justify-content:center;
+      background:
+        radial-gradient(700px 500px at 10% -10%, rgba(59,130,246,.18) 0%, transparent 60%),
+        radial-gradient(700px 500px at 120% 0%, rgba(16,185,129,.16) 0%, transparent 60%),
+        linear-gradient(180deg, #0b1220, #0b1220);
     }
+    h2{ background:#141c2a; color:#e8eefc; }
+    video, canvas, img{ background:#111827; border-color: var(--bd); }
+    button{ background:#111827; color:#e5e7eb; border-color: var(--bd); }
+    .result-card{ background:#0f172a; border-color: var(--bd); }
+    .result-title{ background: #111b2e; border-bottom-color: var(--bd); color:#e5edff; }
+    .result-table th{ background:#0e1626; color:#cbd5e1; }
+    .result-table td{ color:#e5e7eb; }
+  }
+</style>
 
-    /* 置中卡片容器（不影響原有結構） */
-    body > *{
-      width:100%;
-      max-width: 760px;
-      margin-left:auto;
-      margin-right:auto;
-    }
-
-    h2{
-      color:#0f172a;
-      font-size: clamp(1.4rem, 1.1rem + 1.2vw, 1.9rem);
-      font-weight: 700;
-      letter-spacing: .3px;
-      margin: 10px auto 14px;
-      display:inline-flex;
-      align-items:center;
-      gap:.5rem;
-      padding:.4rem .9rem;
-      border-radius: 999px;
-      background: linear-gradient(180deg, #ffffff, #f6f8ff);
-      box-shadow: var(--shadow);
-    }
-
-    p{
-      color:var(--muted);
-      margin:0 auto 10px;
-      font-size:.92rem;
-    }
-
-    /* 視覺卡片：video / img / canvas */
-    video, canvas, img{
-      width:100%;
-      max-width:100%;
-      height:auto;
-      margin-top:12px;
-      border-radius: var(--radius);
-      background:#fff;
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(15,23,42,.06);
-      transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
-    }
-    video:hover, img:hover{
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-lg);
-      border-color: rgba(15,23,42,.09);
-    }
-
-    /* 按鈕統一樣式 */
-    button, input[type="file"]{
-      margin: 10px auto;
-      padding: 12px 18px;
-      font-size: 1rem;
-      border-radius: 10px;
-      border: 1px solid rgba(15,23,42,.06);
-      background: linear-gradient(180deg, #ffffff, #f6f7fb);
-      color: #0f172a;
-      cursor: pointer;
-      box-shadow: var(--shadow);
-      transition: transform .12s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
-    }
-    button:hover{
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-lg);
-      border-color: rgba(15,23,42,.12);
-    }
-    button:active{ transform: translateY(0); box-shadow: var(--shadow); }
-    button:focus-visible{ outline: none; box-shadow: var(--shadow-lg), var(--ring); }
-
-    /* 主要功能鍵配色覆寫（依原有 ID） */
-    #switchCamera{
-      background: linear-gradient(180deg, #e8f0ff, #dfe9ff);
-      color:#0b2a7a;
-    }
-    #submitBtn{
-      background: linear-gradient(180deg, var(--primary), #1d5fe4);
-      color:#fff;
-      border-color: transparent;
-    }
-    #submitBtn:hover{ background: linear-gradient(180deg, var(--primary-hover), #1b55cf); }
-    #submitBtn:disabled{
-      opacity:.75;
-      cursor:not-allowed;
-      filter: saturate(.7);
-    }
-
-    /* 你原本的 action-button（維持寬度與排版、但更漂亮） */
-    .action-button{
-      flex: 1 1 45%;
-      min-width: 150px;
-      max-width: 220px;
-      height: 48px;
-      padding: 12px 16px;
-      font-size: 1rem;
-      border-radius: 12px;
-      border: 1px solid rgba(15,23,42,.06);
-      background: linear-gradient(180deg, var(--accent), #0fb07e);
-      color: #fff;
-      text-decoration:none;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow: var(--shadow);
-      transition: transform .14s ease, box-shadow .18s ease, filter .18s ease;
-    }
-    .action-button:hover{ transform: translateY(-1px); box-shadow: var(--shadow-lg); filter: brightness(1.02); }
-
-    /* 結果與連線資訊 */
-    #result, #connectionResult{
-      margin-top: 16px;
-      font-weight: 600;
-      color:#0f172a;
-    }
-
-    /* 結果卡片（沿用你原本表格，僅調色） */
-    .result-card{
-      margin-top: 18px;
-      background: var(--surface);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(15,23,42,.06);
-      overflow:hidden;
-      text-align:left;
-    }
-    .result-title{
-      padding: 12px 16px;
-      font-weight: 700;
-      color:#0f172a;
-      background: linear-gradient(180deg, #fbfbff, #f5f7ff);
-      border-bottom: 1px solid rgba(15,23,42,.06);
-    }
-    .result-table{
-      width:100%;
-      border-collapse: collapse;
-      font-size: .96rem;
-    }
-    .result-table th,
-    .result-table td{
-      padding: 11px 16px;
-      border-bottom: 1px solid #f1f3f7;
-      vertical-align: top;
-    }
-    .result-table th{
-      width: 42%;
-      background: #fbfcff;
-      color:#334155;
-      font-weight: 600;
-    }
-    .result-table tr:last-child td,
-    .result-table tr:last-child th{ border-bottom: none; }
-
-    /* 小尺寸優化 */
-    @media (max-width: 420px){
-      .result-table th, .result-table td{ padding: 10px 12px; }
-    }
-
-    /* 版心寬度控制（保留你的 700px 行為，但視覺更一致） */
-    @media (min-width: 768px){
-      body{ padding-top: 40px; }
-      body > *{ max-width: 720px; }
-    }
-
-    /* 深色模式加分（跟隨系統，不動功能） */
-    @media (prefers-color-scheme: dark){
-      :root{
-        --bg-grad-1:#101827;
-        --bg-grad-2:#0b1220;
-        --surface:#0f172a;
-        --text:#e5e7eb;
-        --muted:#9aa3b2;
-        --card-bg:#101828e6;
-      }
-      body{
-        background:
-          radial-gradient(800px 600px at 15% -10%, rgba(59,130,246,.2) 0%, transparent 60%),
-          radial-gradient(800px 600px at 100% 0%, rgba(16,185,129,.15) 0%, transparent 60%),
-          linear-gradient(180deg, #0b1220, #0b1220 60%, #0a101a);
-      }
-      h2{ background: linear-gradient(180deg, #0f172a, #111b2e); color:#e8eefc; }
-      p{ color:#9aa3b2; }
-      video, canvas, img{
-        background:#0b1020;
-        border-color: rgba(255,255,255,.06);
-      }
-      button, input[type="file"]{
-        background: linear-gradient(180deg, #141c2c, #0f172a);
-        color:#e5e7eb;
-        border-color: rgba(255,255,255,.06);
-      }
-      .action-button{
-        background: linear-gradient(180deg, #10b981, #0b9467);
-        border-color: rgba(255,255,255,.06);
-      }
-      .result-card{
-        background: #0f172a;
-        border-color: rgba(255,255,255,.06);
-      }
-      .result-title{
-        background: linear-gradient(180deg, #121b2e, #0f172a);
-        border-bottom-color: rgba(255,255,255,.06);
-        color:#e5edff;
-      }
-      .result-table th{ background:#0e1626; color:#cbd5e1; }
-      .result-table td{ color:#e5e7eb; }
-      #result, #connectionResult{ color:#e5e7eb; }
-    }
-  </style>
 </head>
 <body>
 
