@@ -4,148 +4,270 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>體態偵測工具</title>
+  <!-- 可選：Google Font（缺網也不影響功能） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
+    /* ===== 基礎變數（配色、陰影、圓角） ===== */
+    :root{
+      --bg-grad-1:#eef3ff;
+      --bg-grad-2:#f7fbff;
+      --card-bg:#ffffffcc;
+      --text:#1a1a1a;
+      --muted:#6b7280;
+      --primary:#2563eb;        /* 藍 */
+      --primary-hover:#1d4ed8;
+      --accent:#10b981;         /* 綠 */
+      --accent-hover:#0ea371;
+      --surface:#ffffff;
+      --radius:14px;
+      --shadow:0 10px 30px rgba(2,6,23,.08);
+      --shadow-lg:0 16px 45px rgba(2,6,23,.12);
+      --ring:0 0 0 3px rgba(37,99,235,.15);
     }
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      margin: 0;
-      background-color: #f4f4f4;
-      text-align: center;
+
+    * { box-sizing: border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      color:var(--text);
+      /* 柔和漸層背景 */
+      background: radial-gradient(1200px 800px at 20% -10%, #e7f0ff 0%, transparent 60%),
+                  radial-gradient(1200px 900px at 120% 10%, #f0fff9 0%, transparent 60%),
+                  linear-gradient(180deg, var(--bg-grad-1), var(--bg-grad-2));
+      padding: 32px 20px 40px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
     }
-    h2 {
-      color: #333;
+
+    /* 置中卡片容器（不影響原有結構） */
+    body > *{
+      width:100%;
+      max-width: 760px;
+      margin-left:auto;
+      margin-right:auto;
     }
-    video, canvas, img {
-      max-width: 100%;
-      height: auto;
-      margin-top: 10px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+    h2{
+      color:#0f172a;
+      font-size: clamp(1.4rem, 1.1rem + 1.2vw, 1.9rem);
+      font-weight: 700;
+      letter-spacing: .3px;
+      margin: 10px auto 14px;
+      display:inline-flex;
+      align-items:center;
+      gap:.5rem;
+      padding:.4rem .9rem;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #ffffff, #f6f8ff);
+      box-shadow: var(--shadow);
     }
-    button, input[type="file"] {
+
+    p{
+      color:var(--muted);
+      margin:0 auto 10px;
+      font-size:.92rem;
+    }
+
+    /* 視覺卡片：video / img / canvas */
+    video, canvas, img{
+      width:100%;
+      max-width:100%;
+      height:auto;
+      margin-top:12px;
+      border-radius: var(--radius);
+      background:#fff;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(15,23,42,.06);
+      transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    video:hover, img:hover{
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(15,23,42,.09);
+    }
+
+    /* 按鈕統一樣式 */
+    button, input[type="file"]{
       margin: 10px auto;
       padding: 12px 18px;
       font-size: 1rem;
-      border-radius: 6px;
-      border: none;
-      background-color: #4CAF50;
-      color: white;
+      border-radius: 10px;
+      border: 1px solid rgba(15,23,42,.06);
+      background: linear-gradient(180deg, #ffffff, #f6f7fb);
+      color: #0f172a;
       cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform .12s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
     }
-    button:hover {
-      background-color: #45a049;
+    button:hover{
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(15,23,42,.12);
     }
-    #submitBtn {
-      background-color: #2196F3;
+    button:active{ transform: translateY(0); box-shadow: var(--shadow); }
+    button:focus-visible{ outline: none; box-shadow: var(--shadow-lg), var(--ring); }
+
+    /* 主要功能鍵配色覆寫（依原有 ID） */
+    #switchCamera{
+      background: linear-gradient(180deg, #e8f0ff, #dfe9ff);
+      color:#0b2a7a;
     }
-    #submitBtn:hover {
-      background-color: #1976D2;
+    #submitBtn{
+      background: linear-gradient(180deg, var(--primary), #1d5fe4);
+      color:#fff;
+      border-color: transparent;
     }
-    #result, #connectionResult {
-      margin-top: 20px;
-      font-weight: bold;
-      color: #333;
+    #submitBtn:hover{ background: linear-gradient(180deg, var(--primary-hover), #1b55cf); }
+    #submitBtn:disabled{
+      opacity:.75;
+      cursor:not-allowed;
+      filter: saturate(.7);
     }
 
-    /* ✅ 新增：統一按鈕樣式（保留原樣） */
-    .action-button {
+    /* 你原本的 action-button（維持寬度與排版、但更漂亮） */
+    .action-button{
       flex: 1 1 45%;
-      min-width: 140px;
-      max-width: 180px;
+      min-width: 150px;
+      max-width: 220px;
       height: 48px;
-      background-color: #4CAF50;
-      color: white;
       padding: 12px 16px;
       font-size: 1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-sizing: border-box;
-      text-decoration: none;
+      border-radius: 12px;
+      border: 1px solid rgba(15,23,42,.06);
+      background: linear-gradient(180deg, var(--accent), #0fb07e);
+      color: #fff;
+      text-decoration:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: var(--shadow);
+      transition: transform .14s ease, box-shadow .18s ease, filter .18s ease;
     }
+    .action-button:hover{ transform: translateY(-1px); box-shadow: var(--shadow-lg); filter: brightness(1.02); }
 
-    .action-button:hover {
-      background-color: #45a049;
-    }
-
-    @media screen and (min-width: 768px) {
-      body {
-        max-width: 700px;
-        margin: auto;
-      }
-    }
-
-    /* ✅ 新增：結果表格樣式（僅影響結果展示） */
-    .result-card {
+    /* 結果與連線資訊 */
+    #result, #connectionResult{
       margin-top: 16px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-      overflow: hidden;
-      text-align: left;
+      font-weight: 600;
+      color:#0f172a;
     }
-    .result-title {
+
+    /* 結果卡片（沿用你原本表格，僅調色） */
+    .result-card{
+      margin-top: 18px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(15,23,42,.06);
+      overflow:hidden;
+      text-align:left;
+    }
+    .result-title{
       padding: 12px 16px;
       font-weight: 700;
-      color: #333;
-      border-bottom: 1px solid #eee;
+      color:#0f172a;
+      background: linear-gradient(180deg, #fbfbff, #f5f7ff);
+      border-bottom: 1px solid rgba(15,23,42,.06);
     }
-    .result-table {
-      width: 100%;
+    .result-table{
+      width:100%;
       border-collapse: collapse;
-      font-size: 0.95rem;
+      font-size: .96rem;
     }
     .result-table th,
-    .result-table td {
-      padding: 10px 14px;
-      border-bottom: 1px solid #f1f1f1;
+    .result-table td{
+      padding: 11px 16px;
+      border-bottom: 1px solid #f1f3f7;
       vertical-align: top;
     }
-    .result-table th {
-      width: 40%;
-      background: #fafafa;
+    .result-table th{
+      width: 42%;
+      background: #fbfcff;
+      color:#334155;
       font-weight: 600;
-      color: #444;
     }
     .result-table tr:last-child td,
-    .result-table tr:last-child th {
-      border-bottom: none;
+    .result-table tr:last-child th{ border-bottom: none; }
+
+    /* 小尺寸優化 */
+    @media (max-width: 420px){
+      .result-table th, .result-table td{ padding: 10px 12px; }
     }
-    @media (max-width: 420px) {
-      .result-table th, .result-table td { padding: 10px; }
+
+    /* 版心寬度控制（保留你的 700px 行為，但視覺更一致） */
+    @media (min-width: 768px){
+      body{ padding-top: 40px; }
+      body > *{ max-width: 720px; }
+    }
+
+    /* 深色模式加分（跟隨系統，不動功能） */
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg-grad-1:#101827;
+        --bg-grad-2:#0b1220;
+        --surface:#0f172a;
+        --text:#e5e7eb;
+        --muted:#9aa3b2;
+        --card-bg:#101828e6;
+      }
+      body{
+        background:
+          radial-gradient(800px 600px at 15% -10%, rgba(59,130,246,.2) 0%, transparent 60%),
+          radial-gradient(800px 600px at 100% 0%, rgba(16,185,129,.15) 0%, transparent 60%),
+          linear-gradient(180deg, #0b1220, #0b1220 60%, #0a101a);
+      }
+      h2{ background: linear-gradient(180deg, #0f172a, #111b2e); color:#e8eefc; }
+      p{ color:#9aa3b2; }
+      video, canvas, img{
+        background:#0b1020;
+        border-color: rgba(255,255,255,.06);
+      }
+      button, input[type="file"]{
+        background: linear-gradient(180deg, #141c2c, #0f172a);
+        color:#e5e7eb;
+        border-color: rgba(255,255,255,.06);
+      }
+      .action-button{
+        background: linear-gradient(180deg, #10b981, #0b9467);
+        border-color: rgba(255,255,255,.06);
+      }
+      .result-card{
+        background: #0f172a;
+        border-color: rgba(255,255,255,.06);
+      }
+      .result-title{
+        background: linear-gradient(180deg, #121b2e, #0f172a);
+        border-bottom-color: rgba(255,255,255,.06);
+        color:#e5edff;
+      }
+      .result-table th{ background:#0e1626; color:#cbd5e1; }
+      .result-table td{ color:#e5e7eb; }
+      #result, #connectionResult{ color:#e5e7eb; }
     }
   </style>
 </head>
 <body>
 
-  <p style="font-size: 0.85rem; color: #666; margin-bottom: 6px; text-align: center;">
-  本網頁為【AI輔助健康姿勢偵測與矯正系統】偵測功能介面<br>
+  <p style="font-size: 0.9rem; color: #666; margin-bottom: 6px; text-align: center;">
+    本網頁為【AI輔助健康姿勢偵測與矯正系統】偵測功能介面<br>
   </p>
 
-  <h2>📷 駝背偵測工具</h2>
+  <h2>駝背偵測工具</h2>
 
   <button id="switchCamera">🔄 切換鏡頭</button><br>
   <video id="video" autoplay playsinline></video><br>
 
-   <!--  拍照與選圖按鈕：左右排列 + 寬度一致 -->
+  <!-- 保持你原本的排列（不動 inline style 與 DOM） -->
   <div style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
-    <button id="snap" class="action-button">
-      📸 拍照
-    </button>
-
-    <label for="uploadImage" class="action-button">
-      📁 選擇圖片
-    </label>
+    <button id="snap" class="action-button">拍照</button>
+    <label for="uploadImage" class="action-button">選擇圖片</label>
   </div>
 
-  <!-- 隱藏 input -->
   <input type="file" id="uploadImage" accept="image/*" style="display:none;">
 
   <canvas id="canvas" style="display:none;"></canvas>
@@ -154,7 +276,6 @@
   <button id="submitBtn">🚀 上傳圖片</button>
 
   <div id="result"></div>
-
 
 <script>
   const video = document.getElementById('video');
@@ -165,16 +286,11 @@
   const switchCameraBtn = document.getElementById('switchCamera');
   const uploadInput = document.getElementById('uploadImage');
   const resultBox = document.getElementById('result');
-
   const poseBtn = document.getElementById('poseBtn');
 
-  // ✅ 抽出 API 位置（本機/ ngrok / Render 三選一）
   // const API_BASE = "http://127.0.0.1:5000";
   // const API_BASE = "https://<你的-ngrok>.ngrok-free.app";
   const API_BASE = "https://mammary-overwidely-braylen.ngrok-free.dev";
-
-  // （可選）要不要做成下拉選單切換端點？
-  // 先固定用駝背：
   let currentEndpoint = "/hunchback";
 
   let currentStream = null;
@@ -224,9 +340,7 @@
     imageBlob = file;
   };
 
-  /* ✅ 新增：表格渲染函式（其餘邏輯不動） */
   function renderResultTable(r) {
-    // 統一數值格式
     const fmt = (v, opt = {}) => {
       if (v === undefined || v === null) return '—';
       if (typeof v === 'number') {
@@ -239,19 +353,14 @@
     const rows = [];
     if (r.side !== undefined)         rows.push(['面向', r.side]);
     if (r.level !== undefined)        rows.push(['等級', r.level]);
-    //if (r.score !== undefined)        rows.push(['分數', fmt(r.score, { dp: 0 })]);
     if (r.hr !== undefined)           rows.push(['頭前傾比例', fmt(r.hr, { dp: 3 })]);
     if (r.neck_angle !== undefined)   rows.push(['頸部角度', fmt(r.neck_angle, { dp: 1, suffix: '°' })]);
-    //if (r.spine_angle !== undefined)  rows.push(['脊椎角度', fmt(r.spine_angle, { dp: 1, suffix: '°' })]);
     if (r.kyphosis !== undefined)     rows.push(['脊柱後凸', fmt(r.kyphosis, { dp: 1, suffix: '°' })]);
-
-    // 高低肩類欄位
     if (r.higher !== undefined)       rows.push(['較高側', r.higher]);
     if (r.sl_ratio !== undefined)     rows.push(['肩膀高低差比例', fmt(r.sl_ratio, { dp: 3 })]);
     if (r.sl_ratio_rel !== undefined) rows.push(['肩/髖相對比例', fmt(r.sl_ratio_rel, { dp: 3 })]);
     if (r.sl_angle !== undefined)     rows.push(['肩線傾斜角', fmt(r.sl_angle, { dp: 1, suffix: '°' })]);
 
-    // 其他可能擴充欄位（避免漏顯）
     for (const k of Object.keys(r)) {
       if (['side','level','score','hr','neck_angle','spine_angle','kyphosis','higher','sl_ratio','sl_ratio_rel','sl_angle'].includes(k)) continue;
       rows.push([k, r[k]]);
@@ -259,7 +368,7 @@
 
     const tableHTML = `
       <div class="result-card">
-        <div class="result-title">✅ 偵測結果</div>
+        <div class="result-title">偵測結果</div>
         <table class="result-table">
           <tbody>
             ${rows.map(([k, v]) => `
@@ -275,30 +384,26 @@
     resultBox.innerHTML = tableHTML;
   }
 
-  // 這裡改：解析 result 物件，用表格渲染
   submitBtn.onclick = async () => {
     if (!imageBlob) { alert("請先拍照或選擇圖片！"); return; }
-  
-    // UI 提示
     resultBox.innerHTML = "偵測中，請稍後...";
     submitBtn.disabled = true;
-  
+
     try {
-      // ---------- (1) 先要 JSON 指標 ----------
       const fd1 = new FormData();
       fd1.append('file', imageBlob, 'upload.png');
-  
+
       const resJson = await fetch(`${API_BASE}${currentEndpoint}`, {
         method: 'POST',
         body: fd1
       });
-  
+
       const ct = resJson.headers.get('content-type') || '';
       if (!ct.includes('application/json')) {
         const txt = await resJson.text();
         throw new Error(`非 JSON 回應：${resJson.status} ${txt.slice(0,200)}`);
       }
-  
+
       const data = await resJson.json();
       if (!data.success) {
         const msg = "❌ 預測失敗：" + (data.error || "未知錯誤");
@@ -309,23 +414,18 @@
       }
 
       const r = data.result;
-
-      // ✅ 用表格顯示（唯一變更點）
       renderResultTable(r);
-
-      // 可選：結果通知（保留原本）
       alert(`✅ 偵測完成：${r.level || '—'}`);
 
-      // ---------- (2) 取回骨架圖（保留原本） ----------
       const fd2 = new FormData();
       fd2.append('file', imageBlob, 'upload.jpg');
-  
+
       const resImg = await fetch(`${API_BASE}/pose_img?mode=plain`, {
         method: 'POST',
         body: fd2
       });
       if (!resImg.ok) throw new Error(`骨架圖 HTTP ${resImg.status}`);
-  
+
       const blob = await resImg.blob();
       if (preview.src) URL.revokeObjectURL(preview.src);
       preview.src = URL.createObjectURL(blob);
