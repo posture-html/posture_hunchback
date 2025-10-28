@@ -23,9 +23,7 @@
     --shadow-lg: 0 12px 36px rgba(2, 6, 23, 0.12);
   }
 
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
 
   body {
     margin: 0;
@@ -60,9 +58,7 @@
     box-shadow: var(--shadow);
   }
 
-  video,
-  canvas,
-  img {
+  video, canvas, img {
     width: 100%;
     max-width: 100%;
     height: auto;
@@ -74,9 +70,7 @@
   }
 
   /* ===== 按鈕統一樣式 ===== */
-  button,
-  input[type="file"],
-  .action-button {
+  button, input[type="file"], .action-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -89,9 +83,7 @@
     cursor: pointer;
     transition: transform 0.12s ease, box-shadow 0.18s ease, filter 0.18s ease;
   }
-
-  button:hover,
-  .action-button:hover {
+  button:hover, .action-button:hover {
     transform: translateY(-1px);
     box-shadow: var(--shadow-lg);
   }
@@ -114,10 +106,7 @@
     color: #fff;
     border: none;
   }
-
-  #submitBtn:hover {
-    filter: brightness(1.05);
-  }
+  #submitBtn:hover { filter: brightness(1.05); }
 
   #switchCamera {
     width: 100%;
@@ -126,8 +115,7 @@
     border: 1px solid rgba(15, 23, 42, 0.08);
   }
 
-  #result,
-  #connectionResult {
+  #result, #connectionResult {
     margin-top: 16px;
     font-weight: 600;
     color: var(--text);
@@ -144,78 +132,68 @@
     overflow: hidden;
     text-align: left;
   }
-
   .result-title {
     padding: 12px 14px;
     font-weight: 800;
     background: #f9fafb;
     border-bottom: 1px solid #eef1f6;
   }
-
   .result-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.96rem;
   }
-
-  .result-table th,
-  .result-table td {
+  .result-table th, .result-table td {
     padding: 11px 14px;
     border-bottom: 1px solid #f1f3f7;
     vertical-align: top;
     word-break: break-word;
   }
-
   .result-table th {
     width: 44%;
     color: #334155;
     background: #fbfcff;
     font-weight: 700;
   }
+  .result-table tr:last-child th, .result-table tr:last-child td { border-bottom: none; }
 
-  .result-table tr:last-child th,
-  .result-table tr:last-child td {
-    border-bottom: none;
+  /* === 右側異常程度面板（新增） === */
+  .result-wrap{ display:flex; gap:12px; align-items:stretch; margin-top:16px; }
+  .result-left{ flex:1 1 60%; min-width:0; }
+  .result-right{
+    flex:1 1 40%; min-width:220px;
+    background:#fff; border:1px solid rgba(15,23,42,.06);
+    box-shadow: var(--shadow); border-radius: var(--radius); overflow:hidden;
   }
+  .sev-title{ padding:12px 14px; font-weight:800; background:#f9fafb; border-bottom:1px solid #eef1f6; }
+  .sev-list{ list-style:none; margin:0; padding:10px 14px 14px; }
+  .sev-item{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f3f7; }
+  .sev-item:last-child{ border-bottom:none; }
+  .sev-name{ color:#334155; font-weight:600; }
+  .sev-badge{ font-size:.85rem; font-weight:700; padding:4px 10px; border-radius:999px; border:1px solid transparent; line-height:1; }
+  .sev-normal{ color:#166534; background:#dcfce7; border-color:#bbf7d0; }
+  .sev-mild{ color:#92400e; background:#fef3c7; border-color:#fde68a; }
+  .sev-moderate{ color:#7c2d12; background:#ffedd5; border-color:#fed7aa; }
+  .sev-severe{ color:#7f1d1d; background:#fee2e2; border-color:#fecaca; }
+  .sev-na{ color:#475569; background:#f1f5f9; border-color:#e2e8f0; }
 
   /* ===== 響應式設計（手機優化） ===== */
+  @media (max-width: 640px){
+    .result-wrap{ flex-direction:column; }
+    .result-right{ min-width:0; }
+  }
   @media (max-width: 420px) {
-    body {
-      padding: 12px 10px 20px;
-    }
-
-    h2 {
-      font-size: 1.2rem;
-      padding: 8px 12px;
-    }
-
-    .action-button {
-      min-width: 100%;
-      margin-bottom: 8px;
-    }
-
-    .result-table {
-      font-size: 0.94rem;
-    }
-
-    .result-table th,
-    .result-table td {
-      padding: 10px 12px;
-    }
+    body { padding: 12px 10px 20px; }
+    h2 { font-size: 1.2rem; padding: 8px 12px; }
+    .action-button { min-width: 100%; margin-bottom: 8px; }
+    .result-table { font-size: 0.94rem; }
+    .result-table th, .result-table td { padding: 10px 12px; }
   }
-
   @media (min-width: 768px) {
-    body {
-      padding-top: 24px;
-    }
-
-    body > * {
-      max-width: 720px;
-    }
+    body { padding-top: 24px; }
+    body > * { max-width: 720px; }
   }
-</style>
-
-
+  </style>
 </head>
 <body>
 
@@ -306,6 +284,7 @@
     imageBlob = file;
   };
 
+  /* ========= 只改這支：結果渲染（加入異常面板） ========= */
   function renderResultTable(r) {
     const fmt = (v, opt = {}) => {
       if (v === undefined || v === null) return '—';
@@ -316,6 +295,7 @@
       return String(v);
     };
 
+    // 左側：原本表格
     const rows = [];
     if (r.side !== undefined)         rows.push(['面向', r.side]);
     if (r.level !== undefined)        rows.push(['等級', r.level]);
@@ -328,7 +308,7 @@
     if (r.sl_angle !== undefined)     rows.push(['肩線傾斜角', fmt(r.sl_angle, { dp: 1, suffix: '°' })]);
 
     for (const k of Object.keys(r)) {
-      if (['side','level','score','hr','neck_angle','spine_angle','kyphosis','higher','sl_ratio','sl_ratio_rel','sl_angle'].includes(k)) continue;
+      if (['side','level','score','hr','neck_angle','spine_angle','kyphosis','higher','sl_ratio','sl_ratio_rel','sl_angle','lvl_text','hr_score','neck_angle_score','kyphosis_score'].includes(k)) continue;
       rows.push([k, r[k]]);
     }
 
@@ -347,9 +327,61 @@
         </table>
       </div>
     `;
-    resultBox.innerHTML = tableHTML;
+
+    // 右側：異常程度（若後端有 lvl_text 就直接用；否則前端計算）
+    const getBadge = (txt) => {
+      const map = { "正常":"sev-normal", "輕度":"sev-mild", "中度":"sev-moderate", "重度":"sev-severe" };
+      return map[txt] || "sev-na";
+    };
+
+    // 後端已提供的情況
+    let items = [];
+    if (r.lvl_text && typeof r.lvl_text === 'object') {
+      items = [
+        ["整體等級", r.level || "—"],
+        ["頭前傾比例", r.lvl_text["頭前傾比例"]],
+        ["頸部角度",   r.lvl_text["頸部角度"]],
+        ["脊柱後凸",   r.lvl_text["脊柱後凸"]],
+      ].filter(x => x[1] !== undefined);
+    } else {
+      // 沒提供就用既有門檻在前端推斷
+      const lv = {
+        hr:       r.hr       == null ? "—" : (r.hr > 0.35 ? "重度" : r.hr > 0.26 ? "中度" : r.hr > 0.15 ? "輕度" : "正常"),
+        neck:     r.neck_angle == null ? "—" : (r.neck_angle > 40 ? "重度" : r.neck_angle > 30 ? "中度" : r.neck_angle > 18 ? "輕度" : "正常"),
+        kyphosis: r.kyphosis == null ? "—" : (r.kyphosis > 35 ? "重度" : r.kyphosis > 25 ? "中度" : r.kyphosis > 12 ? "輕度" : "正常"),
+      };
+      items = [
+        ["整體等級", r.level || "—"],
+        ["頭前傾比例", lv.hr],
+        ["頸部角度",   lv.neck],
+        ["脊柱後凸",   lv.kyphosis],
+      ];
+    }
+
+    const sevHTML = `
+      <div class="result-right">
+        <div class="sev-title">異常程度</div>
+        <ul class="sev-list">
+          ${items.map(([name, level]) => `
+            <li class="sev-item">
+              <span class="sev-name">${name}</span>
+              <span class="sev-badge ${getBadge(level)}">${level || "—"}</span>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    `;
+
+    // 兩欄一起輸出
+    resultBox.innerHTML = `
+      <div class="result-wrap">
+        <div class="result-left">${tableHTML}</div>
+        ${sevHTML}
+      </div>
+    `;
   }
 
+  /* ========= 其餘流程維持原樣 ========= */
   submitBtn.onclick = async () => {
     if (!imageBlob) { alert("請先拍照或選擇圖片！"); return; }
     resultBox.innerHTML = "偵測中，請稍後...";
