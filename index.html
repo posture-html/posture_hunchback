@@ -225,7 +225,7 @@
       const map = { "正常":"sev-normal", "輕度":"sev-mild", "中度":"sev-moderate", "重度":"sev-severe" };
       return map[txt] || "sev-na";
     };
-
+  
     // 各指標等級（優先用後端 lvl_text；沒有就前端推斷）
     const lv = {
       overall: r.level || "—",
@@ -236,32 +236,28 @@
       ky: (r.lvl_text && r.lvl_text["脊柱後凸"]) ??
           (r.kyphosis == null ? "—" : (r.kyphosis > 35 ? "重度" : r.kyphosis > 25 ? "中度" : r.kyphosis > 12 ? "輕度" : "正常")),
     };
-
-    // 先組不帶徽章的列
+  
+    // 不帶徽章的固定列（面向等）
     const basicRows = [];
     if (r.side !== undefined) basicRows.push(['面向', r.side]);
-    // 其他非主指標的欄位
-    for (const k of Object.keys(r)) {
-      if (['side','level','score','hr','neck_angle','spine_angle','kyphosis','higher','sl_ratio','sl_ratio_rel','sl_angle','lvl_text','hr_score','neck_angle_score','kyphosis_score'].includes(k)) continue;
-      basicRows.push([k, r[k]]);
-    }
-
-    // 主指標（等級 + 三大指標）帶徽章
+  
+    // 帶徽章的主指標列
     const badgeRows = [
-      ["等級",        "", lv.overall],
+      // 等級的值欄直接放等級文字，右側同列顯示徽章
+      ["等級",        lv.overall, lv.overall],
       ["頭前傾比例",  fmt(r.hr, { dp: 3 }), lv.hr],
       ["頸部角度",    fmt(r.neck_angle, { dp: 1, suffix: "°" }), lv.neck],
-      ["脊柱後凸",    fmt(r.kyphosis, { dp: 1, suffix: "°" }), lv.ky],
+      ["脊柱後凸",    fmt(r.kyphosis, { dp: 1, suffix: "°" }),   lv.ky],
     ];
-
-    // 額外參考欄位（如果有）
+  
+    // 額外欄位（先不要有「脊椎角度」）
     const extraRows = [];
-    if (r.spine_angle !== undefined) extraRows.push(['脊椎角度', fmt(r.spine_angle, { dp: 1, suffix: '°' })]);
     if (r.higher !== undefined) extraRows.push(['較高側', r.higher]);
     if (r.sl_ratio !== undefined) extraRows.push(['肩膀高低差比例', fmt(r.sl_ratio, { dp: 3 })]);
     if (r.sl_ratio_rel !== undefined) extraRows.push(['肩/髖相對比例', fmt(r.sl_ratio_rel, { dp: 3 })]);
     if (r.sl_angle !== undefined) extraRows.push(['肩線傾斜角', fmt(r.sl_angle, { dp: 1, suffix: '°' })]);
-
+  
+    // 輸出
     resultBox.innerHTML = `
       <div class="result-card">
         <div class="result-title">偵測結果</div>
@@ -293,6 +289,7 @@
       </div>
     `;
   }
+
 
   /* 其餘流程維持原樣 */
   submitBtn.onclick = async () => {
