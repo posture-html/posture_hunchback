@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>體態偵測工具</title>
-  <!-- 可選：Google Font（缺網也不影響功能） -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -30,22 +29,14 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
       "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     color: var(--text);
-    background: #ffffff; /* ✅ 純白背景 */
+    background: #ffffff;
     padding: 16px 14px 24px;
     text-align: center;
   }
 
-  body > * {
-    width: 100%;
-    max-width: 560px;
-    margin: 0 auto;
-  }
+  body > * { width: 100%; max-width: 560px; margin: 0 auto; }
 
-  p {
-    font-size: 0.9rem;
-    color: var(--muted);
-    margin: 0 0 8px;
-  }
+  p { font-size: 0.9rem; color: var(--muted); margin: 0 0 8px; }
 
   h2 {
     margin: 6px auto 12px;
@@ -59,117 +50,59 @@
   }
 
   video, canvas, img {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    margin-top: 10px;
-    background: #fff;
-    border-radius: var(--radius);
-    border: 1px solid var(--bd);
-    box-shadow: var(--shadow);
+    width: 100%; height: auto; margin-top: 10px;
+    background: #fff; border-radius: var(--radius);
+    border: 1px solid var(--bd); box-shadow: var(--shadow);
   }
 
-  /* ===== 按鈕統一樣式 ===== */
+  /* 按鈕統一樣式 */
   button, input[type="file"], .action-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    padding: 12px 16px;
-    font-size: 1rem;
-    border-radius: 10px;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    box-shadow: var(--shadow);
-    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 0.4rem; padding: 12px 16px; font-size: 1rem;
+    border-radius: 10px; border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: var(--shadow); cursor: pointer;
     transition: transform 0.12s ease, box-shadow 0.18s ease, filter 0.18s ease;
   }
-  button:hover, .action-button:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-lg);
-  }
+  button:hover, .action-button:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
 
-  /* ✅ 拍照 & 選擇圖片：相同綠色樣式 */
   .action-button {
-    flex: 1 1 45%;
-    min-width: 150px;
-    max-width: 200px;
-    height: 48px;
-    color: #fff;
-    background: linear-gradient(180deg, var(--accent), var(--accent-2));
+    flex: 1 1 45%; min-width: 150px; max-width: 200px; height: 48px;
+    color: #fff; background: linear-gradient(180deg, var(--accent), var(--accent-2));
     border: none;
   }
 
-  /* ✅ 上傳圖片：藍色主按鈕，全寬 */
   #submitBtn {
-    width: 100%;
-    background: linear-gradient(180deg, var(--primary), var(--primary-2));
-    color: #fff;
-    border: none;
+    width: 100%; background: linear-gradient(180deg, var(--primary), var(--primary-2));
+    color: #fff; border: none;
   }
   #submitBtn:hover { filter: brightness(1.05); }
 
   #switchCamera {
-    width: 100%;
-    background: #f1f5f9;
-    color: #0b2a7a;
+    width: 100%; background: #f1f5f9; color: #0b2a7a;
     border: 1px solid rgba(15, 23, 42, 0.08);
   }
 
-  #result, #connectionResult {
-    margin-top: 16px;
-    font-weight: 600;
-    color: var(--text);
-    text-align: left;
-  }
+  #result, #connectionResult { margin-top: 16px; font-weight: 600; color: var(--text); text-align: left; }
 
-  /* ===== 結果表格 ===== */
+  /* 結果卡片與表格 */
   .result-card {
-    margin-top: 16px;
-    background: #ffffff;
-    border-radius: var(--radius);
-    border: 1px solid rgba(15, 23, 42, 0.06);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    text-align: left;
+    margin-top: 16px; background: #ffffff; border-radius: var(--radius);
+    border: 1px solid rgba(15, 23, 42, 0.06); box-shadow: var(--shadow);
+    overflow: hidden; text-align: left;
   }
-  .result-title {
-    padding: 12px 14px;
-    font-weight: 800;
-    background: #f9fafb;
-    border-bottom: 1px solid #eef1f6;
-  }
-  .result-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.96rem;
-  }
+  .result-title { padding: 12px 14px; font-weight: 800; background: #f9fafb; border-bottom: 1px solid #eef1f6; }
+  .result-table { width: 100%; border-collapse: collapse; font-size: 0.96rem; }
   .result-table th, .result-table td {
-    padding: 11px 14px;
-    border-bottom: 1px solid #f1f3f7;
-    vertical-align: top;
-    word-break: break-word;
+    padding: 11px 14px; border-bottom: 1px solid #f1f3f7; vertical-align: middle; word-break: break-word;
   }
-  .result-table th {
-    width: 44%;
-    color: #334155;
-    background: #fbfcff;
-    font-weight: 700;
-  }
+  .result-table th { width: 44%; color: #334155; background: #fbfcff; font-weight: 700; }
   .result-table tr:last-child th, .result-table tr:last-child td { border-bottom: none; }
 
-  /* === 右側異常程度面板（新增） === */
-  .result-wrap{ display:flex; gap:12px; align-items:stretch; margin-top:16px; }
-  .result-left{ flex:1 1 60%; min-width:0; }
-  .result-right{
-    flex:1 1 40%; min-width:220px;
-    background:#fff; border:1px solid rgba(15,23,42,.06);
-    box-shadow: var(--shadow); border-radius: var(--radius); overflow:hidden;
-  }
-  .sev-title{ padding:12px 14px; font-weight:800; background:#f9fafb; border-bottom:1px solid #eef1f6; }
-  .sev-list{ list-style:none; margin:0; padding:10px 14px 14px; }
-  .sev-item{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f3f7; }
-  .sev-item:last-child{ border-bottom:none; }
-  .sev-name{ color:#334155; font-weight:600; }
+  /* 讓數值與徽章同列靠兩端 */
+  .result-table .cell { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .result-table .val { white-space: nowrap; }
+
+  /* 異常徽章 */
   .sev-badge{ font-size:.85rem; font-weight:700; padding:4px 10px; border-radius:999px; border:1px solid transparent; line-height:1; }
   .sev-normal{ color:#166534; background:#dcfce7; border-color:#bbf7d0; }
   .sev-mild{ color:#92400e; background:#fef3c7; border-color:#fde68a; }
@@ -177,11 +110,7 @@
   .sev-severe{ color:#7f1d1d; background:#fee2e2; border-color:#fecaca; }
   .sev-na{ color:#475569; background:#f1f5f9; border-color:#e2e8f0; }
 
-  /* ===== 響應式設計（手機優化） ===== */
-  @media (max-width: 640px){
-    .result-wrap{ flex-direction:column; }
-    .result-right{ min-width:0; }
-  }
+  /* 手機優化 */
   @media (max-width: 420px) {
     body { padding: 12px 10px 20px; }
     h2 { font-size: 1.2rem; padding: 8px 12px; }
@@ -206,7 +135,6 @@
   <button id="switchCamera">🔄 切換鏡頭</button><br>
   <video id="video" autoplay playsinline></video><br>
 
-  <!-- 保持你原本的排列（不動 inline style 與 DOM） -->
   <div style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
     <button id="snap" class="action-button">拍照</button>
     <label for="uploadImage" class="action-button">選擇圖片</label>
@@ -230,7 +158,6 @@
   const switchCameraBtn = document.getElementById('switchCamera');
   const uploadInput = document.getElementById('uploadImage');
   const resultBox = document.getElementById('result');
-  const poseBtn = document.getElementById('poseBtn');
 
   // const API_BASE = "http://127.0.0.1:5000";
   // const API_BASE = "https://<你的-ngrok>.ngrok-free.app";
@@ -284,7 +211,7 @@
     imageBlob = file;
   };
 
-  /* ========= 只改這支：結果渲染（加入異常面板） ========= */
+  /* ====== 渲染結果（把異常徽章放在同一列表格右側） ====== */
   function renderResultTable(r) {
     const fmt = (v, opt = {}) => {
       if (v === undefined || v === null) return '—';
@@ -294,94 +221,80 @@
       }
       return String(v);
     };
+    const badgeCls = (txt) => {
+      const map = { "正常":"sev-normal", "輕度":"sev-mild", "中度":"sev-moderate", "重度":"sev-severe" };
+      return map[txt] || "sev-na";
+    };
 
-    // 左側：原本表格
-    const rows = [];
-    if (r.side !== undefined)         rows.push(['面向', r.side]);
-    if (r.level !== undefined)        rows.push(['等級', r.level]);
-    if (r.hr !== undefined)           rows.push(['頭前傾比例', fmt(r.hr, { dp: 3 })]);
-    if (r.neck_angle !== undefined)   rows.push(['頸部角度', fmt(r.neck_angle, { dp: 1, suffix: '°' })]);
-    if (r.kyphosis !== undefined)     rows.push(['脊柱後凸', fmt(r.kyphosis, { dp: 1, suffix: '°' })]);
-    if (r.higher !== undefined)       rows.push(['較高側', r.higher]);
-    if (r.sl_ratio !== undefined)     rows.push(['肩膀高低差比例', fmt(r.sl_ratio, { dp: 3 })]);
-    if (r.sl_ratio_rel !== undefined) rows.push(['肩/髖相對比例', fmt(r.sl_ratio_rel, { dp: 3 })]);
-    if (r.sl_angle !== undefined)     rows.push(['肩線傾斜角', fmt(r.sl_angle, { dp: 1, suffix: '°' })]);
+    // 各指標等級（優先用後端 lvl_text；沒有就前端推斷）
+    const lv = {
+      overall: r.level || "—",
+      hr: (r.lvl_text && r.lvl_text["頭前傾比例"]) ??
+          (r.hr == null ? "—" : (r.hr > 0.35 ? "重度" : r.hr > 0.26 ? "中度" : r.hr > 0.15 ? "輕度" : "正常")),
+      neck: (r.lvl_text && r.lvl_text["頸部角度"]) ??
+            (r.neck_angle == null ? "—" : (r.neck_angle > 40 ? "重度" : r.neck_angle > 30 ? "中度" : r.neck_angle > 18 ? "輕度" : "正常")),
+      ky: (r.lvl_text && r.lvl_text["脊柱後凸"]) ??
+          (r.kyphosis == null ? "—" : (r.kyphosis > 35 ? "重度" : r.kyphosis > 25 ? "中度" : r.kyphosis > 12 ? "輕度" : "正常")),
+    };
 
+    // 先組不帶徽章的列
+    const basicRows = [];
+    if (r.side !== undefined) basicRows.push(['面向', r.side]);
+    // 其他非主指標的欄位
     for (const k of Object.keys(r)) {
       if (['side','level','score','hr','neck_angle','spine_angle','kyphosis','higher','sl_ratio','sl_ratio_rel','sl_angle','lvl_text','hr_score','neck_angle_score','kyphosis_score'].includes(k)) continue;
-      rows.push([k, r[k]]);
+      basicRows.push([k, r[k]]);
     }
 
-    const tableHTML = `
+    // 主指標（等級 + 三大指標）帶徽章
+    const badgeRows = [
+      ["等級",        "", lv.overall],
+      ["頭前傾比例",  fmt(r.hr, { dp: 3 }), lv.hr],
+      ["頸部角度",    fmt(r.neck_angle, { dp: 1, suffix: "°" }), lv.neck],
+      ["脊柱後凸",    fmt(r.kyphosis, { dp: 1, suffix: "°" }), lv.ky],
+    ];
+
+    // 額外參考欄位（如果有）
+    const extraRows = [];
+    if (r.spine_angle !== undefined) extraRows.push(['脊椎角度', fmt(r.spine_angle, { dp: 1, suffix: '°' })]);
+    if (r.higher !== undefined) extraRows.push(['較高側', r.higher]);
+    if (r.sl_ratio !== undefined) extraRows.push(['肩膀高低差比例', fmt(r.sl_ratio, { dp: 3 })]);
+    if (r.sl_ratio_rel !== undefined) extraRows.push(['肩/髖相對比例', fmt(r.sl_ratio_rel, { dp: 3 })]);
+    if (r.sl_angle !== undefined) extraRows.push(['肩線傾斜角', fmt(r.sl_angle, { dp: 1, suffix: '°' })]);
+
+    resultBox.innerHTML = `
       <div class="result-card">
         <div class="result-title">偵測結果</div>
         <table class="result-table">
           <tbody>
-            ${rows.map(([k, v]) => `
+            ${basicRows.map(([k, v]) => `
               <tr>
                 <th>${k}</th>
-                <td>${v}</td>
+                <td class="cell"><span class="val">${v}</span></td>
+              </tr>
+            `).join('')}
+            ${badgeRows.map(([label, val, lvl]) => `
+              <tr>
+                <th>${label}</th>
+                <td class="cell">
+                  <span class="val">${val}</span>
+                  <span class="sev-badge ${badgeCls(lvl)}">${lvl}</span>
+                </td>
+              </tr>
+            `).join('')}
+            ${extraRows.map(([k, v]) => `
+              <tr>
+                <th>${k}</th>
+                <td class="cell"><span class="val">${v}</span></td>
               </tr>
             `).join('')}
           </tbody>
         </table>
       </div>
     `;
-
-    // 右側：異常程度（若後端有 lvl_text 就直接用；否則前端計算）
-    const getBadge = (txt) => {
-      const map = { "正常":"sev-normal", "輕度":"sev-mild", "中度":"sev-moderate", "重度":"sev-severe" };
-      return map[txt] || "sev-na";
-    };
-
-    // 後端已提供的情況
-    let items = [];
-    if (r.lvl_text && typeof r.lvl_text === 'object') {
-      items = [
-        ["整體等級", r.level || "—"],
-        ["頭前傾比例", r.lvl_text["頭前傾比例"]],
-        ["頸部角度",   r.lvl_text["頸部角度"]],
-        ["脊柱後凸",   r.lvl_text["脊柱後凸"]],
-      ].filter(x => x[1] !== undefined);
-    } else {
-      // 沒提供就用既有門檻在前端推斷
-      const lv = {
-        hr:       r.hr       == null ? "—" : (r.hr > 0.35 ? "重度" : r.hr > 0.26 ? "中度" : r.hr > 0.15 ? "輕度" : "正常"),
-        neck:     r.neck_angle == null ? "—" : (r.neck_angle > 40 ? "重度" : r.neck_angle > 30 ? "中度" : r.neck_angle > 18 ? "輕度" : "正常"),
-        kyphosis: r.kyphosis == null ? "—" : (r.kyphosis > 35 ? "重度" : r.kyphosis > 25 ? "中度" : r.kyphosis > 12 ? "輕度" : "正常"),
-      };
-      items = [
-        ["整體等級", r.level || "—"],
-        ["頭前傾比例", lv.hr],
-        ["頸部角度",   lv.neck],
-        ["脊柱後凸",   lv.kyphosis],
-      ];
-    }
-
-    const sevHTML = `
-      <div class="result-right">
-        <div class="sev-title">異常程度</div>
-        <ul class="sev-list">
-          ${items.map(([name, level]) => `
-            <li class="sev-item">
-              <span class="sev-name">${name}</span>
-              <span class="sev-badge ${getBadge(level)}">${level || "—"}</span>
-            </li>
-          `).join('')}
-        </ul>
-      </div>
-    `;
-
-    // 兩欄一起輸出
-    resultBox.innerHTML = `
-      <div class="result-wrap">
-        <div class="result-left">${tableHTML}</div>
-        ${sevHTML}
-      </div>
-    `;
   }
 
-  /* ========= 其餘流程維持原樣 ========= */
+  /* 其餘流程維持原樣 */
   submitBtn.onclick = async () => {
     if (!imageBlob) { alert("請先拍照或選擇圖片！"); return; }
     resultBox.innerHTML = "偵測中，請稍後...";
